@@ -36,17 +36,23 @@ You {result}
 Your final letters were: {letters}
 '''
 
-# User tries
-tries = 3
-
 # Randomly chosen word
-chosen = choice(words)
+chosen = choice(words).upper()
+chosen_word_letters = set(chosen)
+
+# User tries
+tries = len(chosen)
 
 # The list with guessed letters
 letters = []
 
+
+def is_win():
+    return chosen_word_letters.issubset(set(letters))
+
+
 # THE GAME MAIN LOOP
-while tries > 0:
+while tries > 0 and not is_win():
     placeholder = render_placeholder(chosen, letters)
 
     # Intro message
@@ -59,10 +65,14 @@ while tries > 0:
     letters.append(letter)
 
     # Check letter in chosen word
-    tries -= 1
+    if letter not in chosen_word_letters:
+        tries -= 1
 
 # ENDING THE GAME
-if tries > 0:
+
+print(f'DEBUG: {letters=} {chosen_word_letters=} {is_win()=}')
+
+if is_win():
     result = 'Win!!!!'
 else:
     result = 'Lose :('
