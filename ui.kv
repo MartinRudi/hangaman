@@ -1,0 +1,48 @@
+#:kivy 1.0.9
+
+<MainScreen>:    
+    canvas:
+        Rectangle:
+            pos: self.center_x - 5, 0
+            size: 10, self.height
+            
+    Label:
+        font_size: 70  
+        center_x: root.width / 4
+        top: root.top - 50
+        text: "0"
+        
+    Label:
+        font_size: 70  
+        center_x: root.width * 3 / 4
+        top: root.top - 50
+        text: "0"
+
+<KeyboardScreen>:
+    displayLabel: displayLabel
+    kbContainer: kbContainer
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            size_hint_y: 0.15
+            text: "The Hangman Game"
+        BoxLayout:
+            id: kbContainer
+            size_hint_y: 0.2
+            orientation: "horizontal"
+            padding: 10
+        Label:
+            id: displayLabel
+            size_hint_y: 0.15
+            markup: True
+            text: "[b]Letters used: [/b]"
+            halign: "center"
+        Button:
+            text: "Replay"
+            halign: "center"
+            size_hint_y: 0.1
+            on_press: root.say_hello()
+        Widget:
+            # Just a space taker to allow for the popup keyboard
+            size_hint_y: 0.4
+            

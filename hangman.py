@@ -13,7 +13,8 @@ from random import choice
 from helpers import ask_letter, render_placeholder
 
 # Dictionary of words
-words = ['lion', 'dog', 'cat']
+with open('./dict.txt', 'r') as f:
+    words = [el.strip() for el in f.readlines()]
 
 # The main UI message
 message = '''
@@ -36,47 +37,62 @@ You {result}
 Your final letters were: {letters}
 '''
 
-# Randomly chosen word
-chosen = choice(words).upper()
-chosen_word_letters = set(chosen)
 
-# User tries
-tries = len(chosen)
+class HangmanGame:
+    chosen: str
+    chosen_word_letters: set[str]
+    tries: int
+    letters: list[str]
 
-# The list with guessed letters
-letters = []
+    def __init__(self):
+        # Randomly chosen word
+        self.chosen = choice(words).upper()
+        self.chosen_word_letters = set(self.chosen)
+
+        # User tries
+        self.tries = len(self.chosen)
+
+        # The list with guessed letters
+        self.letters = []
+
+    def game_round(self, letter: str):
+        letter = letter.upper()
+        if not self.is_finished() and letter not in self.letters:
+            self.letters.append(letter)
+
+            # Check letter in chosen word
+            if letter not in self.chosen_word_letters:
+                self.tries -= 1
+
+    def is_win(self):
+        return self.chosen_word_letters.issubset(set(self.letters))
+
+    def is_finished(self):
+        return self.tries == 0 or self.is_win()
+
+    def run_in_console(self, letter: str):
+        while not self.is_finished():
+            placeholder = render_placeholder(self.chosen, self.letters)
+
+            # Intro message
+            msg = message.format(amount=self.tries, letters=', '.join(
+                self.letters), placeholder=placeholder)
+            print(msg)
+
+            # Ask for the letter
+            letter = ask_letter('Guess the letter: ', self.letters)
+            self.game_round(letter)
+
+        # ENDING THE GAME
+        if self.is_win():
+            result = 'Win!!!!'
+        else:
+            result = 'Lose :('
+
+        return end_message.format(chosen=self.chosen.upper(), result=result,
+                                  letters=', '.join(self.letters))
 
 
-def is_win():
-    return chosen_word_letters.issubset(set(letters))
-
-
-# THE GAME MAIN LOOP
-while tries > 0 and not is_win():
-    placeholder = render_placeholder(chosen, letters)
-
-    # Intro message
-    msg = message.format(amount=tries, letters=', '.join(
-        letters), placeholder=placeholder)
-    print(msg)
-
-    # Ask for the letter
-    letter = ask_letter('Guess the letter: ', letters)
-    letters.append(letter)
-
-    # Check letter in chosen word
-    if letter not in chosen_word_letters:
-        tries -= 1
-
-# ENDING THE GAME
-
-print(f'DEBUG: {letters=} {chosen_word_letters=} {is_win()=}')
-
-if is_win():
-    result = 'Win!!!!'
-else:
-    result = 'Lose :('
-
-end = end_message.format(chosen=chosen.upper(), result=result,
-                         letters=', '.join(letters))
-print(end)
+if __name__ == '__main__':
+    game = HangmanGame()
+    print(game.chosen_word_letters)
